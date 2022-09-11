@@ -1,7 +1,11 @@
+/*eslint-disable*/
 import React from "react";
 import CollapseWrapper from "../common/collapse";
+import PropTypes from "prop-types";
+import CardWrapper from "../common/Card";
 
 const HocExercise = () => {
+    const ComponentWithHoc = withFunctions(SimpleComponent)
     return (
         <CollapseWrapper title="Упражнение">
             <p className="mt-3">
@@ -76,8 +80,36 @@ const HocExercise = () => {
                 <code>SimpleComponent</code> обновится после перезагрузки
                 страницы
             </p>
+            <ComponentWithHoc />
         </CollapseWrapper>
     );
 };
+
+const SimpleComponent = ({ onLogin, onLogOut, isAuth }) => {
+    return isAuth
+        ? <button className="btn btn-danger" onClick={onLogOut}>Выйти из системы</button>
+        : <button className="btn btn-primary" onClick={onLogin}>Войти</button>
+};
+
+SimpleComponent.propTypes = {
+    onLogin: PropTypes.func,
+    onLogOut: PropTypes.func,
+    isAuth: PropTypes.string
+}
+
+const withFunctions = (Component) => () => {
+    const isAuth = localStorage.getItem("token")
+    const onLogin = () => {
+        localStorage.setItem("token", "true")
+    }
+    const onLogOut = () => {
+        localStorage.removeItem("token")
+    }
+    return (
+        <CardWrapper>
+            <Component onLogOut={onLogOut} onLogin={onLogin} isAuth={isAuth} />
+        </CardWrapper>
+    )
+}
 
 export default HocExercise;
